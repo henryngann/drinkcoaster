@@ -1,0 +1,172 @@
+const int tempSensor = A1; // temp pin?
+const int led       = 9;    // Red LED on pin 9 (PWM)
+const int light     = A0;   // Light Sensor on Analog Pin 0
+const int min_light = 550;   // Minimum Expected Light value
+const int max_light = 835;  // Maximum Expected Light value
+int value           = 0;    // Variable to hold analog readings
+const int speakerPin = 13; // Speaker pin?
+double valueTemp = 0; // hold temp values
+double valueTemp2 = 1;
+int temperture = 0; // the actual temperture calculated
+
+const int redLed = 9;
+const int greenLed = 10;
+const int blueLed = 11;
+
+void setup()
+{
+  pinMode (tempSensor, INPUT);
+  pinMode (led, OUTPUT);
+  pinMode (speakerPin, OUTPUT);
+  
+  pinMode(redLed, OUTPUT);
+  pinMode(greenLed, OUTPUT);
+  pinMode(blueLed, OUTPUT);
+  //console
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  value = analogRead (light);
+  valueTemp = analogRead(tempSensor);
+  valueTemp = valueTemp * 5;
+  valueTemp /= 1024.0;
+  valueTemp = (valueTemp - 0.5)*100;
+  //Temp is at celsius
+  
+  value = map (value, min_light, max_light, 255, 0); // map the light reading in reverse
+  value = constrain (value, 0, 255); // constrain values
+  
+  Serial.println(valueTemp);
+  
+  if(value>=250){ // Once the Coaster is placed on, enter the following IF STATEMENTS.
+    Serial.println(valueTemp2); // Constant update of which mode allows for easy test
+    if(valueTemp2 == 1){ // MODE 1 // Switch cases weird with arduino, so basic if statements are the goto
+      
+      
+      if(valueTemp <= 40){ // If temperture is less than 40, blink red.
+        Serial.println(valueTemp);
+        Serial.println(valueTemp2);
+        digitalWrite(redLed, HIGH);
+        delay(200);
+        digitalWrite(redLed,LOW);
+        delay(200);
+        Serial.println(valueTemp);
+        
+        
+      }
+      //---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--
+      if(valueTemp > 40 && valueTemp < 42) // If temperture is greater then 40(41), and less then 42(41)
+      {
+        digitalWrite(greenLed, LOW);// buffer
+        digitalWrite(blueLed,LOW);
+        digitalWrite(redLed,LOW);// Turn all the LED's off and play a slight buffer to stop flickering lights.
+      }
+      //---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--
+      if(valueTemp >= 42){ // If temperture is greater then 42 (43), enter MODE 2
+        valueTemp2 = 2; // mode switch
+        
+        analogWrite(redLed, 0);
+        analogWrite(greenLed, 255);
+        analogWrite(blueLed, 0);
+        tone(speakerPin, 440);
+        delay(500);
+        noTone(speakerPin);
+        delay(30000);// put 30 second delay
+        Serial.println(valueTemp);
+        Serial.println(valueTemp2);
+        
+      }
+      
+    }
+    if(valueTemp2 == 2){ //WE ARE NOW IN MODE 2
+      
+      if(valueTemp >= 42){ // Once termpeture is greater then 42, continue to play a green LED for 30 seconds.
+        Serial.println(valueTemp);
+        analogWrite(redLed, 0);
+        analogWrite(greenLed, 255);
+        analogWrite(blueLed, 0);
+        tone(speakerPin, 440);
+        delay(500);
+        noTone(speakerPin);
+        delay(30000);// put 30 second delay
+        Serial.println(valueTemp);
+        Serial.println(valueTemp2);
+        
+      }
+      //---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--
+      if(valueTemp >= 40 && valueTemp < 42) // If temperture is greater then 40 (41) and temperture is less than 42 (41)
+      {
+        digitalWrite(greenLed, LOW);// ANOTHER BUFFER FOR GREEN YELLOW
+        digitalWrite(blueLed,LOW);
+        digitalWrite(redLed,LOW);// Turn all the LED's off and play a slight buffer to stop flickering lights.
+      }
+      //---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--
+      
+      if(valueTemp >= 30 && valueTemp < 40){ // If temperture is greater then 30(31-39) and less than 40, drink is cooling down
+        Serial.println(valueTemp);
+        analogWrite(redLed, 255); // Display a yellow light because drink is cooling down
+        analogWrite(greenLed, 255);
+        analogWrite(blueLed, 0);
+        delay(20000); // 20 second delay
+        tone(speakerPin, 440); // 3 buzzes
+        delay(500);
+        noTone(speakerPin);
+        delay(500);
+        tone(speakerPin, 440);
+        delay(500);
+        noTone(speakerPin);
+        delay(500);
+        tone(speakerPin, 440);
+        delay(500);
+        noTone(speakerPin);
+        delay(500);
+        
+        
+        
+      }
+      //---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--
+      if(valueTemp > 28 && valueTemp < 30){ //- > Buffer Between Lights (29) buffer point for no flicker
+        analogWrite(redLed, 0); // buffer off
+        analogWrite(greenLed, 0);
+        analogWrite(blueLed, 0);
+        Serial.println(valueTemp);
+        Serial.println("baffer");
+      }
+      //---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--//---BUFFER--
+      if(valueTemp <= 28){ // red beeping part(27)
+        Serial.println(valueTemp);
+        
+        analogWrite(redLed, 255); // play red continously as the drink has cooled under 28 degrees.
+        analogWrite(greenLed, 0);
+        analogWrite(blueLed, 0);
+        delay(10000); // 10 second delay
+        tone(speakerPin, 440); // 3 buzzes
+        delay(500);
+        noTone(speakerPin);
+        delay(500);
+        tone(speakerPin, 440);
+        delay(500);
+        noTone(speakerPin);
+        delay(500);
+        tone(speakerPin, 440);
+        delay(500);
+        noTone(speakerPin);
+        delay(500);
+        tone(speakerPin, 440);
+        delay(1000);  // last 1 second
+        noTone(speakerPin);
+        delay(500);
+        
+      }
+    } // mode 2 curly bracket
+  } // value curly bracket
+  if(value<250){ // IF THE COASTER IS NOT ON OR TAKEN OFF.
+    valueTemp2 = 1; // WE RESET THE MODE TO 1.
+    analogWrite(redLed, 0); // WE TURN OFF ALL LEDS.
+    analogWrite(greenLed, 0);
+    analogWrite(blueLed, 0);
+    noTone(speakerPin);
+  }                    
+}
