@@ -6,4 +6,4 @@ Small Project that utilizes a(n)
 - TMP36  -> For Temperture Sensing Purposes
 - LDR -> Light Sensor Purposes for detecting CUP Placement
 
-Did not use Switch Statements because they are weird in Arduino.
+Just pasted the code on a txt. Should run fine if pins are setup correctly.
